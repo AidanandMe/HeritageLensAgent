@@ -1,0 +1,19 @@
+# API Keys and Secrets
+.env
+*.env
+.venv/
+env/
+venv/
+
+# Python caching
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Local Databases (Don't sync the actual DB, just the code)
+chroma_db/
+*.db
+
+# OS generated files
+.DS_Store
+Thumbs.db
