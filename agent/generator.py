@@ -91,6 +91,9 @@ SYSTEM METADATA AGGREGATION:
 
 RETRIEVED SOURCES:
 {context_str}
+
+FINAL RE-AFFIRMATION RULE:
+You MUST output your entire response in the EXACT SAME LANGUAGE as the user's query below. If the user's query is in English, EVERY SINGLE WORD of your JSON output must be translated to English, despite the sources above being entirely in Italian.
 """
     
     if is_weak_retrieval:
