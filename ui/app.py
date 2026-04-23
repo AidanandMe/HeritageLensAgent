@@ -89,26 +89,27 @@ def main():
             background: rgba(30, 41, 59, 0.8);
         }
 
-        /* The Differentiator Panel needs to be the iconic "light blue" from the PRD, reinvented */
+        /* The Differentiator Panel needs to be visually distinct but dark enough for text contrast */
         .panel-blue {
-            background: linear-gradient(135deg, #7DD3FC 0%, #38BDF8 100%);
+            background: linear-gradient(135deg, rgba(8, 47, 73, 0.85) 0%, rgba(12, 74, 110, 0.85) 100%);
+            backdrop-filter: blur(16px);
             padding: 32px;
             border-radius: 20px;
             min-height: 550px;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 10px 25px -5px rgba(14, 165, 233, 0.3), inset 0 2px 4px 0 rgba(255, 255, 255, 0.6);
-            border: 1px solid #BAE6FD;
+            box-shadow: 0 10px 25px -5px rgba(14, 165, 233, 0.2), inset 0 1px 1px 0 rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(14, 165, 233, 0.3);
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             animation: slideUpFade 0.6s ease-out forwards;
             opacity: 0;
-            color: #082F49; /* Dark blue text for maximum contrast against cyan */
+            color: #E2E8F0;
         }
 
         .panel-blue:hover {
             transform: translateY(-8px);
-            box-shadow: 0 20px 25px -5px rgba(14, 165, 233, 0.5), inset 0 2px 4px 0 rgba(255, 255, 255, 0.8);
-            filter: brightness(1.05);
+            box-shadow: 0 20px 25px -5px rgba(14, 165, 233, 0.4), inset 0 1px 1px 0 rgba(255, 255, 255, 0.2);
+            filter: brightness(1.1);
         }
 
         .panel-content {
@@ -173,8 +174,8 @@ def main():
         }
 
         .panel-blue h3 {
-            border-bottom: 2px solid rgba(8, 47, 73, 0.15);
-            color: #0C4A6E;
+            border-bottom: 2px solid rgba(14, 165, 233, 0.3);
+            color: #E0F2FE;
         }
 
         .layer-label {
@@ -188,7 +189,7 @@ def main():
         }
 
         .panel-blue .layer-label {
-            color: #0369A1; /* High contrast sky blue inside the light blue panel */
+            color: #38BDF8; /* Sky 400 for dark background */
         }
         
         /* Streamlit inputs customization hack */
