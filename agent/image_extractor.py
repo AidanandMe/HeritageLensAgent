@@ -35,13 +35,15 @@ def extract_image_for_keyword(keyword: str) -> str:
                 if text and keyword in text.lower():
                     # Found the keyword on this page! Check for images.
                     if len(page.images) > 0:
-                        image_obj = page.images[0]
-                        # Extract and save
-                        with open(save_path, "wb") as f:
-                            f.write(image_obj.data)
-                        
-                        print(f"Extracted image from {filepath.name} page {page_num} for keyword '{keyword}'")
-                        return save_path
+                        for image_obj in page.images:
+                            # Filter out small repeating icons/logos (must be > 10KB to be considered a real figure)
+                            if len(image_obj.data) > 10240:
+                                # Extract and save
+                                with open(save_path, "wb") as f:
+                                    f.write(image_obj.data)
+                                
+                                print(f"Extracted image from {filepath.name} page {page_num} for keyword '{keyword}'")
+                                return save_path
         except Exception as e:
             print(f"Error reading {filepath.name}: {e}")
             continue
