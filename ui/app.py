@@ -294,7 +294,56 @@ def main():
                 # LLM output uses \n, but raw HTML strings in st.markdown collapse those without <br> handling
                 ans_text = result.get("layer_1_answer", "Error in Layer 1").replace('\n', '<br>')
                 src_text = result.get("layer_2_sources", "Error in Layer 2").replace('\n', '<br>')
-                transparency_text = result.get("layer_3_transparency", "Error in Layer 3").replace('\n', '<br>')
+                
+                trans_raw = result.get("layer_3_transparency", "Error in Layer 3").strip()
+                for title in ['⚠️ SOURCE BIAS', '📄 ABSENCES', '🕵️ INTERPRETIVE LIMITS', '⚠️ CONFIDENCE']:
+                    trans_raw = trans_raw.replace(f'**{title}**', title).replace(f'### {title}', title).replace(f'## {title}', title)
+
+                titles = {
+                    '⚠️ SOURCE BIAS': '#EF4444',
+                    '📄 ABSENCES': '#F59E0B',
+                    '🕵️ INTERPRETIVE LIMITS': '#0EA5E9',
+                    '⚠️ CONFIDENCE': '#10B981'
+                }
+                
+                parts = []
+                current_title = None
+                current_content = []
+                
+                for line in trans_raw.split('\n'):
+                    line_stripped = line.strip()
+                    found_title = None
+                    for t in titles.keys():
+                        if line_stripped.startswith(t):
+                            found_title = t
+                            break
+                    
+                    if found_title:
+                        if current_title:
+                            parts.append((current_title, '\n'.join(current_content).strip()))
+                        elif '\n'.join(current_content).strip():
+                            parts.append((None, '\n'.join(current_content).strip()))
+                        current_title = found_title
+                        current_content = [line[len(found_title):].strip()]
+                    else:
+                        current_content.append(line)
+                        
+                if current_title:
+                    parts.append((current_title, '\n'.join(current_content).strip()))
+                elif '\n'.join(current_content).strip():
+                    parts.append((None, '\n'.join(current_content).strip()))
+                    
+                rendered_html = ""
+                for t, content in parts:
+                    content_html = content.replace('\n', '<br>')
+                    if t in titles:
+                        color = titles[t]
+                        rendered_html += f'<div style="border-left: 3px solid {color}; padding-left: 12px; margin-bottom: 20px;"><span style="color: {color}; font-weight: 800; font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.05em;">{t}</span><br><br><span style="color: rgba(255,255,255,0.85); font-size: 0.95em;">{content_html}</span></div>'
+                    else:
+                        if content_html:
+                            rendered_html += f'<p>{content_html}</p>'
+                            
+                transparency_text = rendered_html if rendered_html else trans_raw.replace('\n', '<br>')
                 
                 # Fetch image if a keyword was provided
                 keyword = result.get("layer_4_image_keyword")
@@ -341,7 +390,7 @@ def main():
 <div class="panel-blue">
     <h3>WHAT THIS ANSWER DOESN'T KNOW</h3>
     <div class="panel-content">
-        <p>{transparency_text}</p>
+        {transparency_text}
     </div>
     <span class="layer-label">Layer 3: Epistemic transparency — tied to actual retrieved data</span>
 </div>

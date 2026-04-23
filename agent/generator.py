@@ -80,7 +80,18 @@ Your goal is to answer the user's research query using the provided retrieved so
 You MUST output a valid JSON object with EXACTLY four keys:
 - "layer_1_answer": A grounded answer synthesizing ALL relevant information from the retrieved context. Provide the best possible answer based on whatever fragments you find. Do NOT refuse to answer. You can use general knowledge to map concepts, but it MUST be explicitly labelled as [BACKGROUND — not retrieved].
 - "layer_2_sources": A string listing all formatted sources used (Name, Author, Page, Type, Institution). You MUST securely cite the specific 'Page' provided in the context below! Only cite sources present in the retrieved chunks. Format nicely with line breaks using \\n for UI rendering.
-- "layer_3_transparency": An epistemic transparency report formatted as a string containing 4 sections: SOURCE BIAS, ABSENCES, INTERPRETIVE LIMITS, and CONFIDENCE.
+- "layer_3_transparency": An epistemic transparency report. It MUST be formatted as a string containing exactly these 4 section titles with emojis, each followed by your specific analysis on a new line (DO NOT use markdown bolding for the titles):
+⚠️ SOURCE BIAS
+[Your specific analysis]
+
+📄 ABSENCES
+[Your specific analysis]
+
+🕵️ INTERPRETIVE LIMITS
+[Your specific analysis]
+
+⚠️ CONFIDENCE
+[Your specific analysis]
 - "layer_4_image_keyword": A key 1-2 word noun phrase (e.g. "ossidiana" or "olmeca") drawn directly from the topic of the answer, suitable for an exact text-search in the original PDF.
 
 For Layer 3, critically analyse the evidence explicitly using the SYSTEM METADATA AGGREGATION below. 
