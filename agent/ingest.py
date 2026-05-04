@@ -30,8 +30,8 @@ METADATA_MAPPING = {
         "language_of_origin": "italian"
     },
     "MESOAMERICA TRA SEGNO E SIGNIFICATO.pdf": {
-        "source_type": "thesis",
-        "institution": "UNAM",
+        "source_type": "book",
+        "institution": "Centro Studi Americanistici - Circolo Amerindiano",
         "cultural_perspective": "western_academic",
         "language_of_origin": "italian"
     }

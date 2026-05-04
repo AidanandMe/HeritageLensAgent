@@ -64,6 +64,8 @@ def generate_response(query: str, retrieved_chunks: list[dict], rejection_feedba
             author = "Larissa Terranova"
         elif "Mesoamerica tra Segno e Significato" in source_name or "MESOAMERICA TRA SEGNO E SIGNIFICATO" in source_name:
             author = "Romolo Santoni"
+            meta['source_type'] = "book"
+            meta['institution'] = "Centro Studi Americanistici - Circolo Amerindiano"
             
         context_str += f"[Source {idx}]\n"
         context_str += f"Name: {source_name}\n"
