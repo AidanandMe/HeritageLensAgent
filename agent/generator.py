@@ -62,6 +62,7 @@ def generate_response(query: str, retrieved_chunks: list[dict], rejection_feedba
         author = "Unknown"
         if "Formazione della Citta" in source_name:
             author = "Larissa Terranova"
+            meta['source_type'] = "thesis"
         elif "Mesoamerica tra Segno e Significato" in source_name or "MESOAMERICA TRA SEGNO E SIGNIFICATO" in source_name:
             author = "Romolo Santoni"
             meta['source_type'] = "book"

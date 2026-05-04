@@ -24,7 +24,7 @@ except NameError:
 # This JSON projection maps directly to the Layer 3 logic inside 'agent/generator.py'
 METADATA_MAPPING = {
     "Formazione della Citta in Mesoamerica.pdf": {
-        "source_type": "book",
+        "source_type": "thesis",
         "institution": "Italian University Press",
         "cultural_perspective": "western_academic",
         "language_of_origin": "italian"
