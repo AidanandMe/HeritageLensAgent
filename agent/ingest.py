@@ -66,6 +66,8 @@ def load_documents_with_metadata(data_dir: str):
 
         if "Formazione della Citta" in filename:
             metadata_dict["author"] = "Larissa Terranova"
+        elif "Mesoamerica tra Segno e Significato" in filename or "MESOAMERICA TRA SEGNO E SIGNIFICATO" in filename:
+            metadata_dict["author"] = "Romolo Santoni"
 
         print(f"Parsing '{filename}' and injecting dict: {metadata_dict}")
         
