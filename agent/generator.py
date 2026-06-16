@@ -115,9 +115,9 @@ You MUST output your entire response in the EXACT SAME LANGUAGE as the user's qu
     if is_weak_retrieval:
         system_prompt += (
             "\nWEAK RETRIEVAL TRIGGERED:\n"
-            "Retrieval is too weak to provide a confident answer. "
-            "In 'layer_1_answer', summarize what little you have, and indicate the archive is completely missing focused context. "
-            "In 'layer_3_transparency', you MUST significantly expand the 'Absences' section explaining what gaps are missing from the dataset that prevented answering."
+            "Retrieval is too weak to provide a confident answer. The query is likely completely outside the scope of the archive. "
+            "In 'layer_1_answer', you MUST explicitly state that the query is outside the scope of the archive and cannot be answered because no relevant information is present in the dataset. You MUST NOT attempt to answer or describe the query or use general knowledge to fill in details. Keep it very short and direct. "
+            "In 'layer_3_transparency', you MUST significantly expand the 'Absences' section explaining that the archive lacks any dataset sources on this topic, preventing any analysis."
         )
 
     demo_query = "what was the ritual function of obsidian at olmec ceremonial sites?"

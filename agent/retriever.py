@@ -93,10 +93,15 @@ def retrieve_chunks(query: str, top_k: int = 15) -> list:
             continue
         seen_texts.add(node.text)
         
+        # Apply similarity threshold of 0.22 to filter out unrelated chunks
+        score = node_with_score.score
+        if score is not None and score < 0.22:
+            continue
+            
         results.append({
             "text": node.text,
             "metadata": node.metadata,
-            "score": node_with_score.score
+            "score": score
         })
         if len(results) >= top_k:
             break
