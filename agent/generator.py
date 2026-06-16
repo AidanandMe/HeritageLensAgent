@@ -85,7 +85,7 @@ Your goal is to answer the user's research query using the provided retrieved so
 You MUST output a valid JSON object with EXACTLY four keys:
 - "layer_1_answer": A grounded answer synthesizing ALL relevant information from the retrieved context. Provide the best possible answer based on whatever fragments you find. Do NOT refuse to answer. You can use general knowledge to map concepts, but it MUST be explicitly labelled as [BACKGROUND — not retrieved].
 - "layer_2_sources": A string listing all formatted sources used (Name, Author, Page, Type, Institution). You MUST securely cite the specific 'Page' provided in the context below! Only cite sources present in the retrieved chunks. Format nicely with line breaks using \\n for UI rendering.
-- "layer_3_transparency": An epistemic transparency report. It MUST be formatted as a string containing exactly these 4 section titles with emojis, each followed by your specific analysis on a new line (DO NOT use markdown bolding for the titles):
+- "layer_3_transparency": An epistemic transparency report. It MUST be formatted as a string containing exactly these 5 section titles with emojis, each followed by your specific analysis on a new line (DO NOT use markdown bolding for the titles):
 ⚠️ SOURCE BIAS
 [Your specific analysis]
 
@@ -97,6 +97,9 @@ You MUST output a valid JSON object with EXACTLY four keys:
 
 ⚠️ CONFIDENCE
 [Your specific analysis]
+
+💡 FUTURE DEVELOPMENT
+[Your specific analysis and recommendations for expanding the dataset or resolving gaps]
 - "layer_4_image_keyword": A key 1-2 word noun phrase (e.g. "ossidiana" or "olmeca") drawn directly from the topic of the answer. IMPORTANT: Since the original PDFs are written in Italian or Spanish, this keyword MUST be written in the original language of the retrieved sources (e.g. Italian or Spanish, NOT translated to the user's query language) so that it can be found using an exact text search in the PDF.
 
 For Layer 3, critically analyse the evidence explicitly using the SYSTEM METADATA AGGREGATION below. 
@@ -117,7 +120,7 @@ You MUST output your entire response in the EXACT SAME LANGUAGE as the user's qu
             "\nWEAK RETRIEVAL TRIGGERED:\n"
             "Retrieval is too weak to provide a confident answer. The query is likely completely outside the scope of the archive. "
             "In 'layer_1_answer', you MUST explicitly state that the query is outside the scope of the archive and cannot be answered because no relevant information is present in the dataset. You MUST NOT attempt to answer or describe the query or use general knowledge to fill in details. Keep it very short and direct. "
-            "In 'layer_3_transparency', you MUST significantly expand the 'Absences' section explaining that the archive lacks any dataset sources on this topic, preventing any analysis."
+            "In 'layer_3_transparency', you MUST significantly expand the 'Absences' section explaining that the archive lacks any dataset sources on this topic, preventing any analysis. In '💡 FUTURE DEVELOPMENT', recommend what type of data/documents should be added to the repository to answer this query in the future."
         )
 
     demo_query = "what was the ritual function of obsidian at olmec ceremonial sites?"

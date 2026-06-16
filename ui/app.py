@@ -297,14 +297,15 @@ def main():
                 src_text = result.get("layer_2_sources", "Error in Layer 2").replace('\n', '<br>')
                 
                 trans_raw = result.get("layer_3_transparency", "Error in Layer 3").strip()
-                for title in ['⚠️ SOURCE BIAS', '📄 ABSENCES', '🕵️ INTERPRETIVE LIMITS', '⚠️ CONFIDENCE']:
+                for title in ['⚠️ SOURCE BIAS', '📄 ABSENCES', '🕵️ INTERPRETIVE LIMITS', '⚠️ CONFIDENCE', '💡 FUTURE DEVELOPMENT']:
                     trans_raw = trans_raw.replace(f'**{title}**', title).replace(f'### {title}', title).replace(f'## {title}', title)
 
                 titles = {
                     '⚠️ SOURCE BIAS': '#EF4444',
                     '📄 ABSENCES': '#F59E0B',
                     '🕵️ INTERPRETIVE LIMITS': '#0EA5E9',
-                    '⚠️ CONFIDENCE': '#10B981'
+                    '⚠️ CONFIDENCE': '#10B981',
+                    '💡 FUTURE DEVELOPMENT': '#8B5CF6'
                 }
                 
                 parts = []
