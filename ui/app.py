@@ -511,21 +511,38 @@ def main():
             st.markdown("<div style='margin-top: 2px;'></div>", unsafe_allow_html=True)
             eval_button = st.button("Evaluate Video / YouTube", use_container_width=True, key="eval_yt_btn")
             
+        pasted_transcript = st.text_area("Or paste the transcript text directly (recommended fallback for cloud hosting)", placeholder="Paste the transcript of the video here to evaluate it without network restrictions...", height=150, key="eval_pasted_text")
         uploaded_video = st.file_uploader("Or upload a local video/audio file (Max 25MB)", type=["mp4", "mp3", "wav", "m4a"], key="eval_upload_file")
         
         if eval_button:
             target_source = video_url.strip() if video_url else ""
-            if not target_source and not uploaded_video:
-                st.warning("Please provide a YouTube URL or upload a local video file.")
+            if not target_source and not uploaded_video and not pasted_transcript.strip():
+                st.warning("Please provide a YouTube URL, paste a transcript, or upload a local video file.")
             else:
                 with st.spinner("Heritage Lens Agent is extracting transcript and compiling academic validation report..."):
                     try:
                         from agent.video_evaluator import extract_youtube_transcript, evaluate_video
                         
-                        if target_source:
+                        if pasted_transcript.strip():
+                            st.toast("Using pasted transcript...")
+                            transcript_data = {
+                                "text": pasted_transcript.strip()
+                            }
+                            video_title = "Pasted Video Transcript"
+                        elif target_source:
                             st.toast("Extracting transcript from YouTube...")
-                            transcript_data = extract_youtube_transcript(target_source)
-                            video_title = f"YouTube Video ({transcript_data['video_id']})"
+                            try:
+                                transcript_data = extract_youtube_transcript(target_source)
+                                video_title = f"YouTube Video ({transcript_data['video_id']})"
+                            except Exception as yt_err:
+                                raise ValueError(
+                                    f"YouTube blocked the scraping request from our cloud server IP.\n\n"
+                                    f"💡 EASY WORKAROUND:\n"
+                                    f"1. Open the video on YouTube.\n"
+                                    f"2. Click 'Show transcript' in the video description/options.\n"
+                                    f"3. Copy the transcript text.\n"
+                                    f"4. Paste it into the 'Or paste the transcript text directly' text box below and click Evaluate!"
+                                )
                         else:
                             # Local video upload transcription
                             import tempfile
