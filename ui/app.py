@@ -26,6 +26,20 @@ load_dotenv(override=True)
 def main():
     st.set_page_config(layout="wide", page_title="Heritage Lens Agent")
 
+    # Initialize session state for persisting search results
+    if "ans_text" not in st.session_state:
+        st.session_state.ans_text = "[Text block — grounded answer based on retrieved sources]"
+    if "src_text" not in st.session_state:
+        st.session_state.src_text = "Submit a query to parse data sources..."
+    if "transparency_text" not in st.session_state:
+        st.session_state.transparency_text = "Submit a query to evaluate epistemic bounds..."
+    if "trans_raw" not in st.session_state:
+        st.session_state.trans_raw = ""
+    if "image_path" not in st.session_state:
+        st.session_state.image_path = None
+    if "last_query" not in st.session_state:
+        st.session_state.last_query = ""
+
     # Custom CSS for styling the UI to match the wireframe
     st.markdown("""
     <style>
@@ -267,11 +281,6 @@ def main():
     # Panels Setup
     c1, c2, c3 = st.columns(3)
 
-    # Base UI State Placeholders
-    ans_text = "[Text block — grounded answer based on retrieved sources]"
-    src_text = "Submit a query to parse data sources..."
-    transparency_text = "Submit a query to evaluate epistemic bounds..."
-
     with st.sidebar:
         st.header("Research Context")
         st.markdown("**Target Corpus:** Heritage Lens Agent PDFs")
@@ -286,15 +295,53 @@ def main():
         st.markdown("---")
         st.write("This agent actively retrieves information from the curated corpus to ensure epistemic transparency.")
 
+        # Show the Export Session button if there is a completed query in session state
+        if st.session_state.last_query:
+            st.markdown("---")
+            st.markdown("### Export Session")
+            
+            export_ans = st.session_state.ans_text.replace('<br>', '\n')
+            export_src = st.session_state.src_text.replace('<br>', '\n')
+            export_trans = st.session_state.trans_raw
+            
+            export_md = f"""# Heritage Lens Agent — Research Session Export
+
+**Query:** {st.session_state.last_query}
+
+---
+
+## 1. THE ANSWER
+{export_ans}
+
+---
+
+## 2. SOURCES
+{export_src}
+
+---
+
+## 3. WHAT THE SYSTEM DOESN'T KNOW (TRANSPARENCY REPORT)
+{export_trans}
+
+---
+*Exported from Heritage Lens Agent — Accountable AI for Specialised Research*
+"""
+            st.download_button(
+                label="📥 Download Session (Markdown)",
+                data=export_md,
+                file_name=f"heritage_lens_{st.session_state.last_query.lower().replace(' ', '_')[:30]}.md",
+                mime="text/markdown",
+                use_container_width=True
+            )
+
     # When the UI button is clicked!
-    image_path = None
     if search_button and query:
         with st.spinner("Heritage Lens Agent is retrieving specialized sources and constructing the transparency report..."):
             try:
                 result = run_pipeline(query)
                 # LLM output uses \n, but raw HTML strings in st.markdown collapse those without <br> handling
-                ans_text = result.get("layer_1_answer", "Error in Layer 1").replace('\n', '<br>')
-                src_text = result.get("layer_2_sources", "Error in Layer 2").replace('\n', '<br>')
+                local_ans = result.get("layer_1_answer", "Error in Layer 1").replace('\n', '<br>')
+                local_src = result.get("layer_2_sources", "Error in Layer 2").replace('\n', '<br>')
                 
                 trans_raw = result.get("layer_3_transparency", "Error in Layer 3").strip()
                 for title in ['⚠️ SOURCE BIAS', '📄 ABSENCES', '🕵️ INTERPRETIVE LIMITS', '⚠️ CONFIDENCE', '💡 FUTURE DEVELOPMENT']:
@@ -345,17 +392,37 @@ def main():
                         if content_html:
                             rendered_html += f'<p>{content_html}</p>'
                             
-                transparency_text = rendered_html if rendered_html else trans_raw.replace('\n', '<br>')
+                local_transparency = rendered_html if rendered_html else trans_raw.replace('\n', '<br>')
                 
                 # Fetch image if a keyword was provided
                 keyword = result.get("layer_4_image_keyword")
                 retrieved_chunks = result.get("retrieved_chunks", [])
+                local_image_path = None
                 if keyword:
                     from agent.image_extractor import extract_image_for_keyword
                     st.toast(f"Scanning academic corpus for visual data matching '{keyword}'...")
-                    image_path = extract_image_for_keyword(keyword, retrieved_chunks)
+                    local_image_path = extract_image_for_keyword(keyword, retrieved_chunks)
+                    
+                # Save to session state
+                st.session_state.ans_text = local_ans
+                st.session_state.src_text = local_src
+                st.session_state.trans_raw = trans_raw
+                st.session_state.transparency_text = local_transparency
+                st.session_state.image_path = local_image_path
+                st.session_state.last_query = query
             except Exception as e:
-                ans_text = f"Internal Error: {str(e)}"
+                st.session_state.ans_text = f"Internal Error: {str(e)}"
+                st.session_state.src_text = "N/A"
+                st.session_state.transparency_text = "N/A"
+                st.session_state.trans_raw = ""
+                st.session_state.image_path = None
+                st.session_state.last_query = ""
+
+    # Pull variables from session state for rendering
+    ans_text = st.session_state.ans_text
+    src_text = st.session_state.src_text
+    transparency_text = st.session_state.transparency_text
+    image_path = st.session_state.image_path
 
     import base64
     def get_image_html(img_path):
