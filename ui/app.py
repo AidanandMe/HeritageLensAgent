@@ -281,60 +281,7 @@ def main():
     # Panels Setup
     c1, c2, c3 = st.columns(3)
 
-    with st.sidebar:
-        st.header("Research Context")
-        st.markdown("**Target Corpus:** Heritage Lens Agent PDFs")
-        
-        # Diagnostic Check for Streamlit Cloud
-        sqlite_check = os.path.join(workspace_dir, "chroma_db", "chroma.sqlite3")
-        zip_check = os.path.join(workspace_dir, "chroma_db.zip")
-        db_size = os.path.getsize(sqlite_check) / (1024*1024) if os.path.exists(sqlite_check) else 0
-        zip_size = os.path.getsize(zip_check) / (1024*1024) if os.path.exists(zip_check) else 0
-        st.caption(f"💾 *Diagnostics - DB: {db_size:.1f} MB | ZIP: {zip_size:.1f} MB*")
-
-        st.markdown("---")
-        st.write("This agent actively retrieves information from the curated corpus to ensure epistemic transparency.")
-
-        # Show the Export Session button if there is a completed query in session state
-        if st.session_state.last_query:
-            st.markdown("---")
-            st.markdown("### Export Session")
-            
-            export_ans = st.session_state.ans_text.replace('<br>', '\n')
-            export_src = st.session_state.src_text.replace('<br>', '\n')
-            export_trans = st.session_state.trans_raw
-            
-            export_md = f"""# Heritage Lens Agent — Research Session Export
-
-**Query:** {st.session_state.last_query}
-
----
-
-## 1. THE ANSWER
-{export_ans}
-
----
-
-## 2. SOURCES
-{export_src}
-
----
-
-## 3. WHAT THE SYSTEM DOESN'T KNOW (TRANSPARENCY REPORT)
-{export_trans}
-
----
-*Exported from Heritage Lens Agent — Accountable AI for Specialised Research*
-"""
-            st.download_button(
-                label="📥 Download Session (Markdown)",
-                data=export_md,
-                file_name=f"heritage_lens_{st.session_state.last_query.lower().replace(' ', '_')[:30]}.md",
-                mime="text/markdown",
-                use_container_width=True
-            )
-
-    # When the UI button is clicked!
+    # When the UI button is clicked! (Execute search first to update session state)
     if search_button and query:
         with st.spinner("Heritage Lens Agent is retrieving specialized sources and constructing the transparency report..."):
             try:
@@ -417,6 +364,59 @@ def main():
                 st.session_state.trans_raw = ""
                 st.session_state.image_path = None
                 st.session_state.last_query = ""
+
+    with st.sidebar:
+        st.header("Research Context")
+        st.markdown("**Target Corpus:** Heritage Lens Agent PDFs")
+        
+        # Diagnostic Check for Streamlit Cloud
+        sqlite_check = os.path.join(workspace_dir, "chroma_db", "chroma.sqlite3")
+        zip_check = os.path.join(workspace_dir, "chroma_db.zip")
+        db_size = os.path.getsize(sqlite_check) / (1024*1024) if os.path.exists(sqlite_check) else 0
+        zip_size = os.path.getsize(zip_check) / (1024*1024) if os.path.exists(zip_check) else 0
+        st.caption(f"💾 *Diagnostics - DB: {db_size:.1f} MB | ZIP: {zip_size:.1f} MB*")
+
+        st.markdown("---")
+        st.write("This agent actively retrieves information from the curated corpus to ensure epistemic transparency.")
+
+        # Show the Export Session button if there is a completed query in session state
+        if st.session_state.last_query:
+            st.markdown("---")
+            st.markdown("### Export Session")
+            
+            export_ans = st.session_state.ans_text.replace('<br>', '\n')
+            export_src = st.session_state.src_text.replace('<br>', '\n')
+            export_trans = st.session_state.trans_raw
+            
+            export_md = f"""# Heritage Lens Agent — Research Session Export
+
+**Query:** {st.session_state.last_query}
+
+---
+
+## 1. THE ANSWER
+{export_ans}
+
+---
+
+## 2. SOURCES
+{export_src}
+
+---
+
+## 3. WHAT THE SYSTEM DOESN'T KNOW (TRANSPARENCY REPORT)
+{export_trans}
+
+---
+*Exported from Heritage Lens Agent — Accountable AI for Specialised Research*
+"""
+            st.download_button(
+                label="📥 Download Session (Markdown)",
+                data=export_md,
+                file_name=f"heritage_lens_{st.session_state.last_query.lower().replace(' ', '_')[:30]}.md",
+                mime="text/markdown",
+                use_container_width=True
+            )
 
     # Pull variables from session state for rendering
     ans_text = st.session_state.ans_text
