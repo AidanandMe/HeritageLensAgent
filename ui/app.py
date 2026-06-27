@@ -239,6 +239,15 @@ def main():
             transform: translateY(-2px) scale(1.02) !important;
             box-shadow: 0 8px 15px rgba(37, 99, 235, 0.6) !important;
         }
+
+        div[data-testid="stButton"] button:disabled {
+            background: rgba(255, 255, 255, 0.05) !important;
+            color: rgba(255, 255, 255, 0.2) !important;
+            border: 1px solid rgba(255, 255, 255, 0.05) !important;
+            box-shadow: none !important;
+            transform: none !important;
+            cursor: not-allowed !important;
+        }
     </style>
     """, unsafe_allow_html=True)
 
@@ -251,14 +260,52 @@ def main():
     """, unsafe_allow_html=True)
 
     # Search Bar Section
-    col_input, col_button = st.columns([5, 1])
+    col_input, col_search, col_export = st.columns([4, 1, 1])
     with col_input:
         query = st.text_input("Ask a research question...", placeholder="[ Ask a research question in any language... ]", label_visibility="collapsed")
         st.caption("User types research question here and clicks Search")
-    with col_button:
+    with col_search:
         # Provide vertical alignment with text input
         st.markdown("<div style='margin-top: 2px;'></div>", unsafe_allow_html=True)
         search_button = st.button("Search", use_container_width=True)
+    with col_export:
+        st.markdown("<div style='margin-top: 2px;'></div>", unsafe_allow_html=True)
+        if st.session_state.last_query:
+            export_ans = st.session_state.ans_text.replace('<br>', '\n')
+            export_src = st.session_state.src_text.replace('<br>', '\n')
+            export_trans = st.session_state.trans_raw
+            
+            export_md = f"""# Heritage Lens Agent — Research Session Export
+
+**Query:** {st.session_state.last_query}
+
+---
+
+## 1. THE ANSWER
+{export_ans}
+
+---
+
+## 2. SOURCES
+{export_src}
+
+---
+
+## 3. WHAT THE SYSTEM DOESN'T KNOW (TRANSPARENCY REPORT)
+{export_trans}
+
+---
+*Exported from Heritage Lens Agent — Accountable AI for Specialised Research*
+"""
+            st.download_button(
+                label="📥 Export Session",
+                data=export_md,
+                file_name=f"heritage_lens_{st.session_state.last_query.lower().replace(' ', '_')[:30]}.md",
+                mime="text/markdown",
+                use_container_width=True
+            )
+        else:
+            st.button("📥 Export Session", disabled=True, use_container_width=True)
 
     st.markdown("<br>", unsafe_allow_html=True)
 
@@ -357,6 +404,12 @@ def main():
                 st.session_state.transparency_text = local_transparency
                 st.session_state.image_path = local_image_path
                 st.session_state.last_query = query
+                
+                # Immediately rerun the script to update all components in-sync
+                if hasattr(st, "rerun"):
+                    st.rerun()
+                else:
+                    st.experimental_rerun()
             except Exception as e:
                 st.session_state.ans_text = f"Internal Error: {str(e)}"
                 st.session_state.src_text = "N/A"
@@ -364,6 +417,11 @@ def main():
                 st.session_state.trans_raw = ""
                 st.session_state.image_path = None
                 st.session_state.last_query = ""
+                
+                if hasattr(st, "rerun"):
+                    st.rerun()
+                else:
+                    st.experimental_rerun()
 
     with st.sidebar:
         st.header("Research Context")
@@ -378,45 +436,6 @@ def main():
 
         st.markdown("---")
         st.write("This agent actively retrieves information from the curated corpus to ensure epistemic transparency.")
-
-        # Show the Export Session button if there is a completed query in session state
-        if st.session_state.last_query:
-            st.markdown("---")
-            st.markdown("### Export Session")
-            
-            export_ans = st.session_state.ans_text.replace('<br>', '\n')
-            export_src = st.session_state.src_text.replace('<br>', '\n')
-            export_trans = st.session_state.trans_raw
-            
-            export_md = f"""# Heritage Lens Agent — Research Session Export
-
-**Query:** {st.session_state.last_query}
-
----
-
-## 1. THE ANSWER
-{export_ans}
-
----
-
-## 2. SOURCES
-{export_src}
-
----
-
-## 3. WHAT THE SYSTEM DOESN'T KNOW (TRANSPARENCY REPORT)
-{export_trans}
-
----
-*Exported from Heritage Lens Agent — Accountable AI for Specialised Research*
-"""
-            st.download_button(
-                label="📥 Download Session (Markdown)",
-                data=export_md,
-                file_name=f"heritage_lens_{st.session_state.last_query.lower().replace(' ', '_')[:30]}.md",
-                mime="text/markdown",
-                use_container_width=True
-            )
 
     # Pull variables from session state for rendering
     ans_text = st.session_state.ans_text
