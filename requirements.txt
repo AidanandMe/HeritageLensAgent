@@ -7,3 +7,4 @@ llama-index-embeddings-openai
 python-dotenv
 openai
 protobuf==3.20.3
+youtube-transcript-api
